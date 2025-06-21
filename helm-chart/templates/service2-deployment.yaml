@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.service2.name }}
+  labels:
+    app: {{ .Values.service2.name }}
+spec:
+  replicas: {{ .Values.service2.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.service2.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.service2.name }}
+    spec:
+      containers:
+      - name: {{ .Values.service2.name }}
+        image: "{{ .Values.global.registry }}/{{ .Values.service2.image }}:{{ .Values.global.tag }}"
+        imagePullPolicy: {{ .Values.global.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service2.targetPort }}
+        resources:
+          {{- toYaml .Values.service2.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service2.targetPort }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service2.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
