@@ -7,7 +7,7 @@ appVersion: "1.0"
 dependencies:
   - name: bank-vaults
     version: "1.20.0"
-    repository: "https://kubernetes-charts.banzaicloud.com"
+    repository: "https://dharapvj.github.io/ex-banzai-charts"
     condition: vault.enabled
 annotations:
   artifacthub.io/operator: "true"
