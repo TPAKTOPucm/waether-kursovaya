@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.service2.name }}
+  namespace: {{ .Values.global.namespace }}
   labels:
+    {{- include "weather-forecast.labels" . | nindent 4 }}
     app: {{ .Values.service2.name }}
 spec:
   replicas: {{ .Values.service2.replicaCount }}
@@ -13,6 +15,10 @@ spec:
     metadata:
       labels:
         app: {{ .Values.service2.name }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.service2.targetPort | quote }}
+        prometheus.io/path: "/metrics"
     spec:
       containers:
       - name: {{ .Values.service2.name }}
@@ -20,6 +26,9 @@ spec:
         imagePullPolicy: {{ .Values.global.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service2.targetPort }}
+        env:
+        - name: LOG_LEVEL
+          value: "info"
         resources:
           {{- toYaml .Values.service2.resources | nindent 10 }}
         livenessProbe:

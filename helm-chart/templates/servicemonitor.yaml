@@ -1,0 +1,35 @@
+{{- if and .Values.monitoring.enabled .Values.monitoring.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "weather-forecast.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "weather-forecast.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.service1.name }}
+  endpoints:
+  - port: http
+    interval: {{ .Values.monitoring.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.monitoring.serviceMonitor.scrapeTimeout }}
+    path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "weather-forecast.fullname" . }}-service2
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "weather-forecast.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.service2.name }}
+  endpoints:
+  - port: http
+    interval: {{ .Values.monitoring.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.monitoring.serviceMonitor.scrapeTimeout }}
+    path: /metrics
+{{- end }}

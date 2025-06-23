@@ -3,12 +3,13 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .Values.service1.name }}-hpa
+  namespace: {{ .Values.global.namespace }}
   labels:
-    app: {{ .Values.service1.name }}
+    {{- include "weather-forecast.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
     name: {{ .Values.service1.name }}
   minReplicas: {{ .Values.service1.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.service1.autoscaling.maxReplicas }}
@@ -19,19 +20,12 @@ spec:
       target:
         type: Utilization
         averageUtilization: {{ .Values.service1.autoscaling.targetCPUUtilizationPercentage }}
-  {{- if .Values.service1.autoscaling.customMetrics }}
-  {{- range .Values.service1.autoscaling.customMetrics }}
-  - type: {{ .type }}
-    {{- if eq .type "Pods" }}
-    pods:
-      metric:
-        name: {{ .pods.metric.name }}
+  - type: Resource
+    resource:
+      name: memory
       target:
-        type: {{ .pods.target.type }}
-        averageValue: {{ .pods.target.averageValue }}
-    {{- end }}
-  {{- end }}
-  {{- end }}
+        type: Utilization
+        averageUtilization: {{ .Values.service1.autoscaling.targetMemoryUtilizationPercentage }}
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 300
