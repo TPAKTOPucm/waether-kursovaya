@@ -6,14 +6,24 @@ global:
 
 vault:
   enabled: true
-  addr: "https://vault.vault:8200"
+  addr: "https://vault.vault.svc.cluster.local:8200"
   role: "weather-app"
+  authPath: "auth/kubernetes"
+  secretPath: "secret/data/weather-app"
   skipVerify: true
-  authType: "k8s"
+  initContainer:
+    image: "hashicorp/vault-k8s:1.3.1"
+    pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: weather-app-sa
+  annotations: {}
 
 service1:
   name: weather-service1
   image: weather-service1
+  tag: "1.1"
   port: 8080
   targetPort: 8080
   
@@ -22,8 +32,6 @@ service1:
     replicas: 3
     strategy:
       canary:
-        maxSurge: "25%"
-        maxUnavailable: 0
         steps:
         - setWeight: 20
         - pause: { duration: "2m" }
@@ -38,8 +46,6 @@ service1:
         - setWeight: 80
         - pause: { duration: "2m" }
         - setWeight: 100
-        scaleDownDelaySeconds: 30
-        scaleDownDelayRevisionLimit: 2
         
   resources:
     limits:
@@ -59,6 +65,7 @@ service1:
 service2:
   name: weather-service2
   image: weather-service2
+  tag: "1.0"
   replicaCount: 1
   port: 8081
   targetPort: 8081
@@ -76,11 +83,11 @@ service:
 
 ingress:
   enabled: true
-  className: "istio"
+  className: "nginx"
   host: "weather-forecast.local"
-  gateway:
-    name: weather-gateway
-    enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 
 monitoring:
   enabled: true
@@ -98,13 +105,3 @@ analysis:
     failureCondition: "result < 95"
     prometheus:
       address: "http://prometheus.monitoring:9090"
-
-vault:
-  secrets:
-    service2Url:
-      path: "secret/data/weather-app"
-      key: "service2_url"
-      
-env:
-  SERVICE2_URL: "<path:secret/data/weather-app#service2_url>"
-  LOG_LEVEL: "<path:secret/data/weather-app#log_level>"

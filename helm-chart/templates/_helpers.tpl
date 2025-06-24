@@ -47,3 +47,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "weather-forecast.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Service Account name
+*/}}
+{{- define "weather-forecast.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "weather-forecast.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

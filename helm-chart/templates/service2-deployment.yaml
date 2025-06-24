@@ -7,14 +7,16 @@ metadata:
     {{- include "weather-forecast.labels" . | nindent 4 }}
     app: {{ .Values.service2.name }}
 spec:
-  replicas: {{ .Values.service2.replicaCount }}
+  replicas: {{ .Values.service2.replicaCount }}  # 1 реплика
   selector:
     matchLabels:
       app: {{ .Values.service2.name }}
+      {{- include "weather-forecast.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         app: {{ .Values.service2.name }}
+        {{- include "weather-forecast.selectorLabels" . | nindent 8 }}
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: {{ .Values.service2.targetPort | quote }}
@@ -22,10 +24,11 @@ spec:
     spec:
       containers:
       - name: {{ .Values.service2.name }}
-        image: "{{ .Values.global.registry }}/{{ .Values.service2.image }}:{{ .Values.global.tag }}"
+        image: "{{ .Values.global.registry }}/{{ .Values.service2.image }}:{{ .Values.service2.tag }}"
         imagePullPolicy: {{ .Values.global.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service2.targetPort }}
+          name: http
         env:
         - name: LOG_LEVEL
           value: "info"
@@ -34,12 +37,12 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: {{ .Values.service2.targetPort }}
+            port: http
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: {{ .Values.service2.targetPort }}
+            port: http
           initialDelaySeconds: 5
           periodSeconds: 5

@@ -6,6 +6,7 @@ metadata:
   namespace: {{ .Values.global.namespace }}
   labels:
     {{- include "weather-forecast.labels" . | nindent 4 }}
+    app: {{ .Values.service1.name }}
 spec:
   scaleTargetRef:
     apiVersion: argoproj.io/v1alpha1

@@ -2,10 +2,11 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "weather-forecast.fullname" . }}
+  name: {{ include "weather-forecast.fullname" . }}-service1
   namespace: {{ .Values.global.namespace }}
   labels:
     {{- include "weather-forecast.labels" . | nindent 4 }}
+    app: {{ .Values.service1.name }}
 spec:
   selector:
     matchLabels:
@@ -23,6 +24,7 @@ metadata:
   namespace: {{ .Values.global.namespace }}
   labels:
     {{- include "weather-forecast.labels" . | nindent 4 }}
+    app: {{ .Values.service2.name }}
 spec:
   selector:
     matchLabels:
