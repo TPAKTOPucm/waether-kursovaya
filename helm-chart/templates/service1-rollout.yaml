@@ -34,7 +34,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.service1.name }}
-        version: stable
+        version: {{ .Values.service1.tag }}
         {{- include "weather-forecast.selectorLabels" . | nindent 8 }}
       annotations:
         prometheus.io/scrape: "true"
