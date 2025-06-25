@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: weather-application
+  namespace: weather
+spec:
+    project: default
+    source:
+      repoURL: https://github.com/TPAKTOPucm/waether-kursovaya
+      path: helm-chart
+      targetRevision: HEAD
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: weather

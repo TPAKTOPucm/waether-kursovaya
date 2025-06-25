@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: vault
+  labels:
+    app.kubernetes.io/name: vault
+spec:
+    project: default
+    source:
+      repoURL: https://github.com/hashicorp/vault-helm
+      path: .
+      targetRevision: HEAD
+      helm:
+        values: |
+          server:
+            dev:
+              enabled: true
+              devRootToken: "root"
+            
+            service:
+              type: ClusterIP
+              port: 8200
+            
+            dataStorage:
+              enabled: true
+              size: 5Gi
+              mountPath: "/vault/data"
+              storageClass: standard
+            
+            resources:
+              requests:
+                memory: 256Mi
+                cpu: 250m
+              limits:
+                memory: 512Mi
+                cpu: 500m
+
+          injector:
+            enabled: false
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: vault
+    syncPolicy:
+      syncOptions:
+        - CreateNamespace=true
+        - PrunePropagationPolicy=foreground
