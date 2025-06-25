@@ -10,7 +10,7 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: {{ .Values.service1.name }}
+    app: {{ .Values.service1.name }}-stable
     version: stable
 ---
 apiVersion: v1
@@ -25,5 +25,5 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: {{ .Values.service1.name }}
+    app: {{ .Values.service1.name }}-canary
     version: canary
