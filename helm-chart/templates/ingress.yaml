@@ -18,7 +18,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: {{ .Values.service1.name }}
+            name: {{ .Values.service1.name }}-stable
             port:
               number: {{ .Values.service1.port }}
       - path: /condition
