@@ -35,12 +35,6 @@ service1:
         steps:
         - setWeight: 20
         - pause: { duration: "2m" }
-        - analysis:
-            templates:
-            - templateName: success-rate
-            args:
-            - name: service-name
-              value: weather-service1
         - setWeight: 50
         - pause: { duration: "5m" }
         - setWeight: 80
@@ -102,6 +96,8 @@ analysis:
     interval: "2m"
     count: 3
     failureLimit: 1
+    successLimit: 5
     failureCondition: "result < 95"
+    successCondition: "result >= 95"
     prometheus:
       address: "http://prometheus.monitoring:9090"

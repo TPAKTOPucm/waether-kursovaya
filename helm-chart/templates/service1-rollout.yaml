@@ -11,7 +11,22 @@ spec:
   replicas: {{ .Values.service1.rollout.replicas }}
   strategy:
     canary:
-      {{- toYaml .Values.service1.rollout.strategy.canary | nindent 6 }}
+      canaryService: {{ .Values.service1.name }}-canary
+      stableService: {{ .Values.service1.name }}-stable
+      {{- if .Values.service1.rollout.strategy.canary.steps }}
+      steps:
+        {{- toYaml .Values.service1.rollout.strategy.canary.steps | nindent 8 }}
+      {{- end }}
+      analysis:
+        templates:
+        - templateName: success-rate
+        args:
+        - name: service-name
+          value: {{ .Values.service1.name }}
+        {{- if .Values.analysis.successRate.enabled }}
+        successfulRunHistoryLimit: {{ .Values.analysis.successRate.successLimit }}
+        unsuccessfulRunHistoryLimit: {{ .Values.analysis.successRate.failureLimit }}
+        {{- end }}
   selector:
     matchLabels:
       app: {{ .Values.service1.name }}

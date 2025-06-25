@@ -1,17 +1,29 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.service1.name }}
+  name: {{ .Values.service1.name }}-stable
   namespace: {{ .Values.global.namespace }}
-  labels:
-    {{- include "weather-forecast.labels" . | nindent 4 }}
-    app: {{ .Values.service1.name }}
 spec:
-  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service1.port }}
-      targetPort: {{ .Values.service1.targetPort }}
-      protocol: TCP
-      name: http
+  - port: {{ .Values.service1.port }}
+    targetPort: {{ .Values.service1.targetPort }}
+    protocol: TCP
+    name: http
   selector:
     app: {{ .Values.service1.name }}
+    version: stable
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service1.name }}-canary
+  namespace: {{ .Values.global.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.service1.port }}
+    targetPort: {{ .Values.service1.targetPort }}
+    protocol: TCP
+    name: http
+  selector:
+    app: {{ .Values.service1.name }}
+    version: canary

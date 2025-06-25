@@ -28,6 +28,6 @@ spec:
               service="{{`{{args.service-name}}`}}"
             }[5m]))
           )
-    successCondition: result >= 95
+    successCondition: {{ .Values.analysis.successRate.successCondition }}
     failureCondition: {{ .Values.analysis.successRate.failureCondition }}
 {{- end }}
